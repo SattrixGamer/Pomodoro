@@ -1,1 +1,13 @@
-# Gei
+import { useState, useEffect } from "react"; import { Button } from "@/components/ui/button"; import { Card, CardContent } from "@/components/ui/card";
+
+const motivations = [ "Bhai, tune ek aur session crack kar diya! Keep going!", "Bas thoda aur dhakka de, ISI tera hai!", "Tera focus hi tera superpower hai, lage reh!", "Agle session me aur tez chalna hai, tu unstoppable hai!", "Success sirf consistency se aati hai, aur tu wahi kar raha hai!" ];
+
+export default function PomodoroTimer() { const [studyTime, setStudyTime] = useState(25); const [breakTime, setBreakTime] = useState(5); const [rounds, setRounds] = useState(1); const [timeLeft, setTimeLeft] = useState(0); const [isRunning, setIsRunning] = useState(false); const [isBreak, setIsBreak] = useState(false); const [completedRounds, setCompletedRounds] = useState(0); const [motivation, setMotivation] = useState("");
+
+useEffect(() => { let timer; if (isRunning && timeLeft > 0) { timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000); } else if (isRunning && timeLeft === 0) { if (isBreak) { setCompletedRounds(completedRounds + 1); if (completedRounds + 1 >= rounds) { setIsRunning(false); setMotivation("🎉 Tu beast mode me tha! All sessions complete! 🎉"); } else { setIsBreak(false); setTimeLeft(studyTime * 60); } } else { setIsBreak(true); setTimeLeft(breakTime * 60); setMotivation(motivations[Math.floor(Math.random() * motivations.length)]); } } return () => clearTimeout(timer); }, [isRunning, timeLeft, isBreak, completedRounds, rounds, studyTime, breakTime]);
+
+const startPomodoro = () => { setCompletedRounds(0); setMotivation(""); setIsBreak(false); setTimeLeft(studyTime * 60); setIsRunning(true); };
+
+return ( <Card className="p-4 max-w-md mx-auto text-center"> <h1 className="text-xl font-bold">🔥 Pomodoro Timer 🔥</h1> <div className="my-4"> <label>Study (min): </label> <input type="number" value={studyTime} onChange={(e) => setStudyTime(Number(e.target.value))} className="border p-1 w-16" /> </div> <div> <label>Break (min): </label> <input type="number" value={breakTime} onChange={(e) => setBreakTime(Number(e.target.value))} className="border p-1 w-16" /> </div> <div> <label>Rounds: </label> <input type="number" value={rounds} onChange={(e) => setRounds(Number(e.target.value))} className="border p-1 w-16" /> </div> <Button className="mt-4" onClick={startPomodoro} disabled={isRunning}> Start Pomodoro </Button> <CardContent className="mt-4 text-lg"> {timeLeft > 0 ? ${Math.floor(timeLeft / 60)}:${timeLeft % 60} : "Done!"} <br /> {motivation && <p className="mt-2 text-green-600">{motivation}</p>} </CardContent> </Card> ); }
+
+
